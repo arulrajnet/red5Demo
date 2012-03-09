@@ -87,9 +87,9 @@
 			swfobject.createCSS("#flashContent", "display:block;text-align:left;");
 			
 					<!--Get the user information from php and pass it. This function will call, once the swf gets loaded-->
-					function updateSocialUser() {
-						updateUserInfo('venkat.red5','Venkat R','Vellore',60);
-						/*updateUserInfo(USER_NAME, DISPLAY_NAME, PLACE, BROADCAST_TIME_IN_SEC);*/
+					function updateDemoUser() {
+						updateUserInfo('steve.jops','Steve Jops','Applle');
+						/*updateUserInfo(USER_NAME, DISPLAY_NAME, PLACE);*/
 					}			
 			
 					<!-- this is called from swf, once receive a group message -->
@@ -101,6 +101,10 @@
 					function sendGroupMessage(message) {
 						document.getElementById("@application@").sendGroupMessageJS(message);
 					}			
+					
+					function updateUserInfo(loginName, displayName, city) {
+						document.getElementById("@application@").updateUserInfoJS(loginName, displayName, city);
+					}					
 			
         </script>
     </head>

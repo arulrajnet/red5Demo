@@ -30,13 +30,13 @@ package com.demo.models
 		
 		public var camSeletedItem:int = 0;
 		
-		public var fmMicSelectedItem:int = 0;
+		public var audioMicSelectedItem:int = 0;
 		
 		public var videoMicSelectedItem:int = 0;
 		
 		public var camSelectedName:String;
 		
-		public var fmMicSelectedName:String;
+		public var audioMicSelectedName:String;
 		
 		public var videoMicSelectedName:String;
 
@@ -46,7 +46,7 @@ package com.demo.models
 		
 		public var micQuality:int = DemoConstants.AUDIO_QUALITY;
 		
-		public var fmVolume:int = DemoConstants.DEFAULT_SPEAKER_VOLUME;
+		public var audioVolume:int = DemoConstants.DEFAULT_SPEAKER_VOLUME;
 		
 		public var videoVolume:int = DemoConstants.DEFAULT_SPEAKER_VOLUME;
 		

@@ -242,7 +242,7 @@ History	:
 			useHandCursor="true" 
 			buttonMode="true"    
 			click="toggleMute(event)" />
-		<s:HSlider id="volumeSlider" toolTip="FM Volume" value="{DemoConstants.DEFAULT_SPEAKER_VOLUME}" 
+		<s:HSlider id="volumeSlider" toolTip="Audio Volume" value="{DemoConstants.DEFAULT_SPEAKER_VOLUME}" 
 			skinClass="com.demo.skin.VolumeSlider"
 			minimum="1" maximum="100" snapInterval="1" stepSize="1" 
 			useHandCursor="true" 

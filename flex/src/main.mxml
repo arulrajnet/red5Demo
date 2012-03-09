@@ -263,11 +263,10 @@
 			/**
 			 * Call From javascript 
 			 */
-			public function updateUserInfoJS(loginName:String, displayName:String, place:String, broadcastTime:Number):void {
+			public function updateUserInfoJS(loginName:String, displayName:String, place:String):void {
 				this.demoUser.loginName = loginName;
 				this.demoUser.displayName = displayName;
 				this.demoUser.place = place;
-				this.demoUser.broadcastTime = broadcastTime;
 			}
 			
 			public function updateChannelInfoJS(title:String, description:String):void {
@@ -289,11 +288,13 @@
 			}
 			
 			public function autoCallUpdateUser():void {
-				ExternalInterface.call("updatedemoUser");
+				ExternalInterface.call("updateDemoUser");
 			}			
 			
 			public function autoCallUpdateChannel():void {
-				ExternalInterface.call("updatedemoChannel");
+				if(demoUser.role == Role.ADMIN) {
+					ExternalInterface.call("updateDemoChannel");
+				}
 			}			
 			
 			/**
@@ -385,4 +386,27 @@
 	</fx:Script>
 	<views:Admin id="adminView" includeIn="admin" visible="{demoUser.role==Role.ADMIN ? true : false}" includeInLayout="{adminView.visible}" height="100%" width="100%"/>
 	<views:Player id="playerView" includeIn="player" visible="{demoUser.role==Role.PLAYER ? true : false}" includeInLayout="{playerView.visible}" height="100%" width="100%"/>
+	<!-- Information -->
+	<s:VGroup id="infoGroup">
+		<s:HGroup>
+			<s:Label text="Username : " />
+			<s:Label text="{demoUser.loginName}" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="Random id : " />
+			<s:Label text="{demoUser.id}" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="Channel Name : " />
+			<s:Label text="{demoChannel.channelName}" />
+		</s:HGroup>	
+		<s:HGroup>
+			<s:Label text="Red5 Server : " />
+			<s:Label text="{this.hostname}" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="rtmp url : " />
+			<s:Label text="rtmp://{this.hostname}/{DemoConstants.MAIN_APP}/{demoChannel.channelName}/{DemoConstants.VIDEO_STREAM_NAME}" />
+		</s:HGroup>		
+	</s:VGroup>
 </s:Application>

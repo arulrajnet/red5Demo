@@ -79,7 +79,6 @@ public class CommonUtility {
 		user.setSex((String) flexUser.get("sex"));
 		user.setRole(getRole((String) ((ObjectMap)flexUser.get("role")).get("name")));
 		user.setPlace((String)flexUser.get("place"));
-		user.setBroadcastTime((Integer)flexUser.get("broadcastTime"));
 		user.setVideo((Boolean)flexUser.get("video"));
 		user.setAudio((Boolean) flexUser.get("audio"));
 		LOG.debug("java user : "+user.toString());
@@ -101,7 +100,6 @@ public class CommonUtility {
 		userMap.put("sex",user.getSex());
 		userMap.put("role", roleMap);
 		userMap.put("place", user.getPlace());
-		userMap.put("broadcastTime", user.getBroadcastTime());
 		userMap.put("video", user.getVideo());
 		userMap.put("audio", user.getAudio());
 		LOG.debug("flex user object map : "+userMap.toString());
@@ -155,7 +153,6 @@ public class CommonUtility {
 		user.setSex(flexUser.get("sex") != null ? (String) flexUser.get("sex") : user.getSex());
 		user.setRole(flexUser.get("role") != null ? getRole((String) ((ObjectMap)flexUser.get("role")).get("name")) : user.getRole());
 		user.setPlace(flexUser.get("place") != null ? (String) flexUser.get("place") : user.getPlace());
-		user.setBroadcastTime(flexUser.get("broadcastTime") != null ? (Integer) flexUser.get("broadcastTime") : user.getBroadcastTime());
 		user.setVideo(flexUser.get("video") != null ? (Boolean) flexUser.get("video") : user.getVideo());
 		user.setAudio(flexUser.get("audio") != null ? (Boolean) flexUser.get("audio") : user.getAudio());
 		

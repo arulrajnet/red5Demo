@@ -27,8 +27,6 @@ package com.demo.models
 		
 		public var place:String;
 
-		public var broadcastTime:int;
-		
 		public var video:Boolean;
 		
 		public var audio:Boolean;
@@ -40,8 +38,8 @@ package com.demo.models
 		
 		public function toString():String {
 			return StringUtil.substitute("[Class User] id {0}, loginName {1} displayName {2}, " +
-				"sex {3}, role {4}, place {5}, broadcastTime {8}, video {6}, audio {7}",id, loginName, displayName,
-				sex, role.toString(), place, video, audio, broadcastTime);
+				"sex {3}, role {4}, place {5}, video {6}, audio {7}",id, loginName, displayName,
+				sex, role.toString(), place, video, audio);
 		}
 	}
 }

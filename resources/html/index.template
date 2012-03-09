@@ -86,13 +86,13 @@
 			swfobject.createCSS("#flashContent", "display:block;text-align:left;");
 			
 					<!--Get the user information from php and pass it. This function will call, once the swf gets loaded-->
-					function updateSocialUser() {
-						updateUserInfo('arulraj.venni','Arulraj V','Chennai',60);
-						/*updateUserInfo(USER_NAME, DISPLAY_NAME, PLACE, BROADCAST_TIME_IN_SEC);*/
+					function updateDemoUser() {
+						updateUserInfo('bill.gaets','Bill Gaets','Macrosoft');
+						/*updateUserInfo(USER_NAME, DISPLAY_NAME, PLACE);*/
 					}
 					
 					<!--Get the room information from php and pass it. This function will call, once the swf gets loaded-->
-					function updateSocialChannel() {
+					function updateDemoChannel() {
 						updateChannelInfo('Music', 'For testing something we are creating this');
 						/*updateRoomInfo(CHANNEL_TITLE, CHANNEL_DESC);*/
 					}
@@ -107,8 +107,8 @@
 						document.getElementById("@application@").sendGroupMessageJS(message);
 					}
 					
-					function updateUserInfo(loginName, displayName, city, userType) {
-						document.getElementById("@application@").updateUserInfoJS(loginName, displayName, city, userType);
+					function updateUserInfo(loginName, displayName, city) {
+						document.getElementById("@application@").updateUserInfoJS(loginName, displayName, city);
 					}
 					
 					function updateChannelInfo(title, description) {

@@ -84,8 +84,8 @@ package com.demo.connection
 			var micIndex:int = -1;
 			
 			if(micArray != null && micArray.length > 0) {
-				microphoneName = micArray.getItemAt(FlexGlobals.topLevelApplication.demoSettings.fmMicSelectedItem) as String;
-				micIndex = FlexGlobals.topLevelApplication.demoSettings.fmMicSelectedItem;
+				microphoneName = micArray.getItemAt(FlexGlobals.topLevelApplication.demoSettings.audioMicSelectedItem) as String;
+				micIndex = FlexGlobals.topLevelApplication.demoSettings.audioMicSelectedItem;
 			}
 			
 			if(micIndex != -1) {
@@ -184,11 +184,11 @@ package com.demo.connection
 		override public function netConnectionStatus(event:NetStatusEvent):void {
 			LOG.debug("Status : "+event.info.code);
 			if(event.info.code == "NetStream.Publish.Start") {
-				FlexGlobals.topLevelApplication.adminView.fmPublishButton.label = "Stop";
+				FlexGlobals.topLevelApplication.adminView.audioPublishButton.label = "Stop";
 			} else if(event.info.code == "NetStream.Pause.Notify") {
-				FlexGlobals.topLevelApplication.adminView.fmPublishButton.label = "Publish";
+				FlexGlobals.topLevelApplication.adminView.audioPublishButton.label = "Publish";
 			} else if (event.info.code == "NetStream.Unpublish.Success") {
-				FlexGlobals.topLevelApplication.adminView.fmPublishButton.label = "Publish";
+				FlexGlobals.topLevelApplication.adminView.audioPublishButton.label = "Publish";
 			} else if(event.info.code == "NetConnection.Connect.Success") {
 				createSO();
 			}

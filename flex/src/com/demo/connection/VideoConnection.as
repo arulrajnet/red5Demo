@@ -159,7 +159,7 @@ package com.demo.connection
 				}				
 				
 				if (microphone != null || camera != null) {
-					liveStream.publish(FlexGlobals.topLevelApplication.demoUser.id,"live");
+					liveStream.publish(DemoConstants.VIDEO_STREAM_NAME,"live");
 				}
 			}	
 		}		

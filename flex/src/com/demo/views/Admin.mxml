@@ -71,7 +71,7 @@ History	:
 				SoundMixer.computeSpectrum(spectrumBA, true, 0);
 			}
 			
-			private function onFMVolumeChange(value:uint):void {
+			private function onAudioVolumeChange(value:uint):void {
 				FlexGlobals.topLevelApplication.audioConn.changeMicVolume(value);
 			}		
 			
@@ -85,20 +85,6 @@ History	:
 				timer = new Timer(100);
 				timer.addEventListener(TimerEvent.TIMER, checkTrack);
 			}
-
-
-			/*protected function onFMPublishClick(event:MouseEvent):void
-			{
-				fmPublishButton.label = "Publishing...";
-				FlexGlobals.topLevelApplication.audioConn.publishLiveAudio();
-			}
-			
-			protected function onFMStopClick(event:MouseEvent):void
-			{
-				fmPublishButton.label = "Stopping...";
-				FlexGlobals.topLevelApplication.audioConn.stopLiveAudio();
-				fmPublishButton.label = "Publish";
-			}*/
 			
 			protected function onVideoPublishClick(event:MouseEvent):void
 			{
@@ -124,15 +110,6 @@ History	:
 	<s:layout>
 		<s:VerticalLayout verticalAlign="top"/>
 	</s:layout>
-	<!--<s:Label text="Select FM Input : "/>
-	<s:HGroup>
-		<s:DropDownList id="fmMicNames" dataProvider="@{application.demoSettings.micArray}" 
-						selectedIndex="@{application.demoSettings.fmMicSelectedItem}" />
-		<s:HSlider id="fmVolumeSlider" change="onFMVolumeChange(fmVolumeSlider.value)" toolTip="FM Volume" 
-				   minimum="1" maximum="100" snapInterval="1" stepSize="1" value="@{application.demoSettings.fmVolume}" />
-	</s:HGroup>
-	<s:Button id="fmPublishButton" click="{fmPublishButton.label == 'Publish'? onFMPublishClick(event) : onFMStopClick(event)}" label="Publish" />-->
-	
 	<s:Label text="Publish Your Video : "/>
 	<s:HGroup>
 		<s:DropDownList id="cameraNames" dataProvider="@{application.demoSettings.cameraArray}" 

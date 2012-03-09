@@ -33,8 +33,6 @@ public class User {
 	
 	private String place = DemoConstants.ALL;
 	
-	private int broadcastTime = 60; //In seconds
-	
 	private Boolean video = Boolean.FALSE;
 	
 	private Boolean audio = Boolean.FALSE;
@@ -131,20 +129,6 @@ public class User {
 	public void setPlace(String place) {
 		this.place = place;
 	}
-	
-  /**
-   * @return the broadcastTime
-   */
-  public int getBroadcastTime() {
-    return broadcastTime;
-  }
-  
-  /**
-   * @param broadcastTime the broadcastTime to set
-   */
-  public void setBroadcastTime(int broadcastTime) {
-    this.broadcastTime = broadcastTime;
-  }
 
   /**
 	 * @return the video

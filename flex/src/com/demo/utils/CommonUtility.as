@@ -72,7 +72,6 @@ package com.demo.utils
 				demoUser.sex = obj.sex;
 				demoUser.role = getRole(obj.role as String);				
 				demoUser.place = obj.place;
-				demoUser.broadcastTime = obj.broadcastTime;
 				demoUser.audio = obj.audio;
 				demoUser.video = obj.video;
 			}
