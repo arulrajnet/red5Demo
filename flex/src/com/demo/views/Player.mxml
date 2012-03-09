@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File	: Player.mxml
+Date	: Mar 09, 2012
+Owner	: arul
+Project	: red5Demo
+Contact	: http://www.arulraj.net
+Description :
+History	:
+-->
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:views="com.demo.views.*"
+		 creationComplete="onCreationComplete(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.demo.utils.DemoConstants;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			
+			private static var LOG:ILogger = Log.getLogger('Player.mxml');
+			
+			[Bindable]
+			private var application:Object = FlexGlobals.topLevelApplication;			
+
+			protected function onCreationComplete(event:FlexEvent):void
+			{
+				LOG.debug("Player type : "+application.playerType);
+				this.currentState = application.playerType;
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:layout>
+		<s:VerticalLayout verticalAlign="top" paddingLeft="10" paddingRight="10"/>
+	</s:layout>
+	<s:states>
+		<s:State name="video" />
+		<s:State name="audio" />		
+	</s:states>
+	
+	<views:VideoPlayer id="videoPlayer" includeIn="video"/>
+	
+	<views:AudioPlayer id="audioPlayer" includeIn="audio" />
+</s:Group>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File	: VideoPlayer.mxml
+Date	: Mar 09, 2012
+Owner	: arul
+Project	: red5Demo
+Contact	: http://www.arulraj.net
+Description :
+History	:
+-->
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.demo.utils.DemoConstants;
+			
+			import mx.core.FlexGlobals;
+			
+			[Bindable]
+			private var application:Object = FlexGlobals.topLevelApplication;
+			
+			[Embed(source="../../../../assets/video/play-timeline.png")]
+			private static const PLAY:Class;
+			
+			[Embed(source="../../../../assets/video/pause.png")]
+			private static const STOP:Class;			
+			
+			[Embed(source="../../../../assets/video/volume.png")]
+			private static const UNMUTE:Class;
+			
+			[Embed(source="../../../../assets/video/mute.png")]
+			private static const MUTE:Class;
+			
+			[Embed(source="../../../../assets/maximize.png")]
+			private static const MAXIMIZE:Class;
+			
+			[Embed(source="../../../../assets/restore.png")]
+			private static const MINIMIZE:Class;
+			
+			[Embed(source="../../../../assets/video/logo.png")]
+			private static const LOGO:Class;			
+			
+			protected function onVideoPlayClick(event:MouseEvent):void
+			{
+				FlexGlobals.topLevelApplication.videoConn.playLiveStream();
+			}
+			
+			protected function onVideoPauseClick(event:MouseEvent):void
+			{
+				FlexGlobals.topLevelApplication.videoConn.pauseLiveStream();
+			}
+			
+			protected function togglePlay(event:MouseEvent):void
+			{
+				if(playIcon.toolTip == 'Play') {
+					playIcon.source = STOP;
+					playIcon.toolTip = 'Stop';
+					FlexGlobals.topLevelApplication.videoConn.playLiveStream();
+				} else {
+					playIcon.source = PLAY;
+					playIcon.toolTip = 'Play';
+					FlexGlobals.topLevelApplication.videoConn.pauseLiveStream();
+				}
+			}
+			
+			protected function next(event:MouseEvent):void
+			{
+				FlexGlobals.topLevelApplication.next();
+			}
+			
+			protected function toggleMute(event:MouseEvent):void
+			{
+				if(volumeIcon.toolTip == "Mute") {
+					FlexGlobals.topLevelApplication.videoConn.changeSpeakarVolume(0);
+					volumeIcon.source = MUTE;
+					volumeIcon.toolTip = "Unmute";
+				} else {
+					FlexGlobals.topLevelApplication.videoConn.changeSpeakarVolume(volumeSlider.value);
+					volumeIcon.source = UNMUTE;
+					volumeIcon.toolTip = "Mute";
+				}
+			}
+			
+			protected function onVolumeChange(event:Event):void
+			{
+				FlexGlobals.topLevelApplication.videoConn.changeSpeakarVolume(volumeSlider.value);
+				if(volumeSlider.value == 0) {
+					
+				} else {
+					
+				}
+			}
+			
+			/**
+			 * Toggle full screen
+			 */
+			public function toggleFullscreen(event:MouseEvent):void {
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+				FlexGlobals.topLevelApplication.toggleFullscreen(event);
+			}
+			
+			private function fullScreenHandler(event:FullScreenEvent):void {
+				if(event.fullScreen) {
+					fullScreenIcon.source = MINIMIZE;
+					liveVideoDisplay.width = stage.width;
+					liveVideoDisplay.height = stage.height - playerControls.height;
+					FlexGlobals.topLevelApplication.videoConn.changeVideoDimention(liveVideoDisplay.width, liveVideoDisplay.height);
+					this.currentState = "fullscreen";
+				}else {
+					fullScreenIcon.source = MAXIMIZE;
+					liveVideoDisplay.width = playerControls.width;
+					liveVideoDisplay.height = DemoConstants.ADMIN_VIDEO_HEIGHT;
+					FlexGlobals.topLevelApplication.videoConn.changeVideoDimention(liveVideoDisplay.width, liveVideoDisplay.height);
+					this.currentState = "normal";
+				}
+			}			
+			
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout gap="0" verticalAlign="middle" horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="fullscreen" />
+	</s:states>
+	
+	<s:Group id="videoGroup" width="100%" height="100%">
+		<s:SkinnableContainer id="liveVideoSkin" 
+							  width="100%" height="100%"
+							  skinClass="com.demo.skin.VideoDisplaySkin">
+		</s:SkinnableContainer>	
+		<s:VideoDisplay id="liveVideoDisplay" name="liveVideoDisplay"
+						width="{playerControls.width}" height="{DemoConstants.PLAYER_VIDEO_HEIGHT}">
+		</s:VideoDisplay>		
+	</s:Group>
+	
+	<s:SkinnableContainer id="playerControls" skinClass="com.demo.skin.BackgroundSkin"
+						  height="30" horizontalCenter="0">
+		<s:layout>
+			<s:HorizontalLayout gap="10" verticalAlign="middle" paddingLeft="10" paddingRight="10" />
+		</s:layout>
+		<mx:Image id="playIcon" source="{PLAY}" toolTip="Play" 
+				  useHandCursor="true" 
+				  buttonMode="true"    
+				  click="togglePlay(event)" />
+		<s:HSlider id="timelineSlider" toolTip="Video Time" value="0" skinClass="com.demo.skin.VolumeSlider"
+				   minimum="0" maximum="100"
+				   width="200"
+				   enabled="false" />
+		<mx:Image id="volumeIcon" source="{UNMUTE}" toolTip="Mute" 
+				  useHandCursor="true" 
+				  buttonMode="true"    
+				  click="toggleMute(event)" />		
+		<s:HSlider id="volumeSlider" toolTip="Video Volume" value="{DemoConstants.DEFAULT_SPEAKER_VOLUME}" skinClass="com.demo.skin.VolumeSlider"
+				   minimum="1" maximum="100" snapInterval="1" stepSize="1" 
+				   useHandCursor="true" 
+				   buttonMode="true"
+				   change="onVolumeChange(event)" />
+		<mx:Image id="fullScreenIcon" source="{MAXIMIZE}" toolTip="Maximize" 
+				  useHandCursor="true" 
+				  buttonMode="true"    
+				  click="toggleFullscreen(event)" />
+		<mx:Image source="{LOGO}"/>
+	</s:SkinnableContainer>
+	
+</s:Group>

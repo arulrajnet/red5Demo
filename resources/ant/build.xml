@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="red5Demo" default="development" basedir=".">
+
+	<!-- Load Environment specific properties from properties file -->
+	<property file="build.properties" />
+	<property environment="env" />
+	
+	<fail unless="env.FLEX_HOME" message="FLEX_HOME needs to be defined as an environment variable or in the Ant build." />
+	<fail unless="env.JAVA_HOME" message="JAVA_HOME needs to be defined as an environment variable or in the Ant build." />
+	<fail unless="env.RED5_HOME" message="RED5_HOME needs to be defined as an environment variable or in the Ant build." />
+	
+	<property name="FLEX_HOME" value="${env.FLEX_HOME}" />
+	<property name="JAVA_HOME" value="${env.JAVA_HOME}" />
+	<property name="RED5_HOME" value="${env.RED5_HOME}" />
+	
+	<!-- Log file for build -->
+	<target name="logBuild">
+		<tstamp>
+			<format property="timestamp" pattern="dd-MM-yyyy_HH-mm-ss"/>
+		</tstamp>
+		<property name="build.log.dir" location="${basedir}/buildlogs"/>
+		<mkdir dir="${build.log.dir}"/>
+		<property name="build.log.filename" value="build_${timestamp}.log"/>
+		<record name="${build.log.dir}/${build.log.filename}" loglevel="verbose" action="start" append="false"/>
+		<echo message="Build logged to ${build.log.filename}"/>
+	</target>
+
+	<!-- Load the flex tasks for compiling the actionScript code -->
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/${FLEX.TASK.DIR}" />
+
+	<path id="project.classpath">
+		<fileset dir="${RED5_HOME}/lib"/>
+		<fileset file="${RED5_HOME}/red5.jar"/>
+		<!-- project specific libs -->
+		<fileset dir="${java.lib.dir}"/>
+	</path>
+
+	 <!-- Init with echoing some info to the console -->
+	<target name="init" description="Initializes the build">
+        <condition property="java.target_version" value="1.6">
+            <not>
+                <isset property="java.target_version"/>
+            </not>
+        </condition>
+        <tstamp prefix="build">
+            <format property="TODAY" pattern="dd-MMMM-yyyy hh:mm:ss aa" locale="en"/>
+        </tstamp>
+		<echo message="================================================="/>
+		<echo message="${project.name}-${project.version} [${build.TODAY}]"/>
+		<echo message="Copyright (c) ${project.year} ${project.owner}"/>
+		<echo message="OS : ${os.name}" />
+		<echo message="Author: ${author}" />
+		<echo message="For support: ${contact.email}" />
+		<echo message="================================================="/>
+	</target>
+
+	<!-- Prepare directories for build -->
+    <target name="prepare" description="Setup the directories for building">
+		<mkdir dir="${flex.build.dir}"/>
+		<mkdir dir="${java.build.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+     </target>
+
+	<!-- Compile Main Application -->
+	<target name="compile" depends="init,prepare,flex-compile,java-compile" description="Compiles related modules">
+		<echo>Compiling java and flex files...</echo>
+	</target>
+	
+	<target name="java-compile">
+	     <javac sourcepath="" srcdir="${java.src.dir}" destdir="${java.build.dir}" classpathref="project.classpath"
+	             optimize="${build.optimize}" verbose="${build.verbose}" fork="${build.fork}" nowarn="${build.nowarn}"
+	             deprecation="${build.deprecation}" debug="true" compiler="modern" includeantruntime="false"
+	             source="${java.target_version}" target="${java.target_version}" listfiles="false"/>	
+	</target>
+	
+	<target name="flex-compile">
+		<mxmlc
+			file="${flex.main.class}"
+			output="${flex.export.swf}"
+	  		incremental="false"
+			optimize="true"
+			locale="en_US"
+			maxmemory="1024m"
+			actionscript-file-encoding="UTF-8"
+			keep-generated-actionscript="false"
+			static-link-runtime-shared-libraries="false" >
+				<!--<load-config filename="${flex.config.dir}/flex-config.xml"/>-->
+				<load-config filename="${FLEX_HOME}/frameworks/air-config.xml" />
+				<compiler.source-path path-element="${flex.src.dir}"/>
+				<compiler.include-libraries dir="${flex.lib.dir}" append="true">
+					<include name="*.swc" />
+				</compiler.include-libraries>
+				<!-- Metadata -->
+				<metadata 
+					title="${project.name}" 
+					description="${project.description}" 
+					date="${build.TODAY}">
+					<publisher name="${project.owner}"/>
+					<creator name="${author}"/>
+					<contributor name="${project.owner.url}"/>
+				</metadata>
+		</mxmlc>	
+	</target>
+	
+	<target name="generateWrapperDev">
+		<html-wrapper 
+		        title="${project.name}" 
+		        file="${application.name}.html" 
+		        height="100%" width="100%" 
+		        bgcolor="white" application="${application.name}" 
+		        swf="${flex.swf.name}" 
+		        version-major="10" version-minor="0" version-revision="0" 
+		        history="true" output="${flex.build.dir}" />
+		
+			<copy file="${flex.html.dir}/index.template" tofile="${flex.build.dir}/index.html" overwrite="true">
+				<filterchain>
+					<replacetokens>
+						<token key="title" value="${project.name}" />
+						<token key="version_major" value="${major.version}"/>
+						<token key="version_minor" value="${minor.version}"/>
+						<token key="version_revision" value="${revision.version}"/>
+						<token key="application" value="${application.name}"/>
+						<token key="width" value="100%"/>
+						<token key="height" value="100%"/>
+						<token key="bgcolor" value="#FFFFFF"/>
+						<token key="swf" value="${flex.swf.name}"/>
+						<token key="expressInstallSwf" value="${express.install.swf}"/>
+						<token key="red5.server" value="${dev.server}"/>
+						<token key="red5.secure" value="${dev.secure}"/>
+						<token key="project.name" value="${project.name}"/>
+						<token key="project.version" value="${project.version}"/>
+						<token key="project.year" value="${project.year}"/>
+						<token key="copyright.client" value="${copyright.client}"/>
+						<token key="support.email" value="${contact.email}"/>
+						<token key="build.type" value="Development"/>
+					</replacetokens>
+				</filterchain>
+			</copy>
+			<copy file="${flex.html.dir}/player.template" tofile="${flex.build.dir}/player.html" overwrite="true">
+				<filterchain>
+					<replacetokens>
+						<token key="title" value="${project.name}" />
+						<token key="version_major" value="${major.version}"/>
+						<token key="version_minor" value="${minor.version}"/>
+						<token key="version_revision" value="${revision.version}"/>
+						<token key="application" value="${application.name}"/>
+						<token key="width" value="100%"/>
+						<token key="height" value="100%"/>
+						<token key="bgcolor" value="#FFFFFF"/>
+						<token key="swf" value="${flex.swf.name}"/>
+						<token key="expressInstallSwf" value="${express.install.swf}"/>
+						<token key="red5.server" value="${dev.server}"/>
+						<token key="red5.secure" value="${dev.secure}"/>
+						<token key="red5.playerType" value="video"/>						
+						<token key="project.name" value="${project.name}"/>
+						<token key="project.version" value="${project.version}"/>
+						<token key="project.year" value="${project.year}"/>
+						<token key="copyright.client" value="${copyright.client}"/>
+						<token key="support.email" value="${contact.email}"/>
+						<token key="build.type" value="Development"/>
+					</replacetokens>
+				</filterchain>
+			</copy>					
+	</target>
+	
+	<target name="generateWrapperProduction">
+		<html-wrapper 
+		        title="${project.name}" 
+		        file="${application.name}.html" 
+		        height="100%" width="100%" 
+		        bgcolor="white" application="${application.name}" 
+		        swf="${flex.swf.name}" 
+		        version-major="10" version-minor="0" version-revision="0" 
+		        history="true" output="${flex.build.dir}" />
+		
+		<copy file="${flex.html.dir}/index.template" tofile="${flex.build.dir}/index.html" overwrite="true">
+			<filterchain>
+				<replacetokens>
+					<token key="title" value="${project.name}" />
+					<token key="version_major" value="${major.version}"/>
+					<token key="version_minor" value="${minor.version}"/>
+					<token key="version_revision" value="${revision.version}"/>
+					<token key="application" value="${application.name}"/>
+					<token key="width" value="100%"/>
+					<token key="height" value="100%"/>
+					<token key="bgcolor" value="#FFFFFF"/>
+					<token key="swf" value="${flex.swf.name}"/>
+					<token key="expressInstallSwf" value="${express.install.swf}"/>
+					<token key="red5.server" value="${production.server}"/>
+					<token key="red5.secure" value="${production.secure}"/>
+					<token key="project.name" value="${project.name}"/>
+					<token key="project.version" value="${project.version}"/>
+					<token key="project.year" value="${project.year}"/>
+					<token key="copyright.client" value="${copyright.client}"/>
+					<token key="support.email" value="${contact.email}"/>
+					<token key="build.type" value="Production"/>            	
+				</replacetokens>
+			</filterchain>
+		</copy>
+		<copy file="${flex.html.dir}/player.template" tofile="${flex.build.dir}/player.html" overwrite="true">
+			<filterchain>
+				<replacetokens>
+					<token key="title" value="${project.name}" />
+					<token key="version_major" value="${major.version}"/>
+					<token key="version_minor" value="${minor.version}"/>
+					<token key="version_revision" value="${revision.version}"/>
+					<token key="application" value="${application.name}"/>
+					<token key="width" value="100%"/>
+					<token key="height" value="100%"/>
+					<token key="bgcolor" value="#FFFFFF"/>
+					<token key="swf" value="${flex.swf.name}"/>
+					<token key="expressInstallSwf" value="${express.install.swf}"/>
+					<token key="red5.server" value="${production.server}"/>
+					<token key="red5.secure" value="${production.secure}"/>
+					<token key="red5.playerType" value="video"/>
+					<token key="project.name" value="${project.name}"/>
+					<token key="project.version" value="${project.version}"/>
+					<token key="project.year" value="${project.year}"/>
+					<token key="copyright.client" value="${copyright.client}"/>
+					<token key="support.email" value="${contact.email}"/>
+					<token key="build.type" value="Production"/>      
+				</replacetokens>
+			</filterchain>
+		</copy>			
+	</target>	
+
+	<!-- Clean output dirs -->
+	<target name="clean" description="clean all generated files">
+		<delete dir="${flex.build.dir}"/>
+		<delete dir="${java.build.dir}"/>
+		<delete dir="${dist.dir}"/>
+	</target>
+
+	<!-- Run all, default -->
+	<target name = "dist" description="setup the destination directory">
+		<copy todir="${dist.dir}/html">
+			<fileset dir="${flex.html.dir}">
+				<exclude name="*.template" />
+			</fileset>
+			<fileset dir="${flex.build.dir}" />
+		</copy>
+		<copy todir="${dist.dir}/WEB-INF">
+			<fileset dir="${java.dir}/WEB-INF" />
+		</copy>
+		<copy todir="${dist.dir}/WEB-INF/lib">
+			<fileset dir="${java.dir}/lib" >
+				<exclude name="red5.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.dir}/WEB-INF/classes">
+			<fileset dir="${java.build.dir}" />
+		</copy>
+		<copy file="${java.src.dir}/logback-${application.name}.xml" todir="${dist.dir}/WEB-INF/classes" />
+	</target>
+
+	<target name="war" depends="dist">
+		<tstamp prefix="build">
+			<format property="TODAY" pattern="dd-MMMM-yyyy hh:mm:ss aa" locale="en"/>
+		</tstamp>
+		<war destfile="${dist.dir}/${application.name}.war" webxml="${dist.dir}/WEB-INF/web.xml">
+			<fileset dir="${dist.dir}">
+			</fileset>
+			<lib dir="${java.dir}/lib"/>
+			<manifest>
+				<attribute name="Built" value="${build.TODAY} by ${author}"/>
+				<attribute name="Build-OS" value="${os.name} ${os.version}"/>
+				<attribute name="Build-Java" value="Java ${java.version}"/>
+			</manifest>
+		</war>
+	</target>
+
+	<target name = "deploy" depends="dist" description="deploy the files into red5 server">
+			<copy todir="${RED5_HOME}/webapps/${application.name}/">
+				<fileset dir="${dist.dir}" />
+			</copy>
+		
+			<copy todir="/var/www/html/${application.name}">
+				<fileset dir="${dist.dir}/html/" />
+			</copy>
+	</target>
+
+	<target name="development"
+		depends="usage,clean,compile,generateWrapperDev,deploy"
+		description="Complete development build in efficient sequence">
+		<tstamp prefix="build">
+			<format property="TODAY" pattern="dd-MMMM-yyyy hh:mm:ss aa" locale="en"/>
+		</tstamp>
+		<echo>Dev server builded on ${build.TODAY}...</echo>
+	</target>
+	
+	<target name="production"
+		depends="usage,clean,compile,generateWrapperProduction,war"
+		description="Complete production build in efficient sequence">
+		<tstamp prefix="build">
+			<format property="TODAY" pattern="dd-MMMM-yyyy hh:mm:ss aa" locale="en"/>
+		</tstamp>
+		<echo>Production server builded on ${build.TODAY}...</echo>
+	</target>
+	
+	<target name="usage">
+		<echo>Type 'ant -p' for available targets</echo>
+	</target>	
+</project>

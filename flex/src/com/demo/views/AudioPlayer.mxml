@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File	: AudioPlayer.mxml
+Date	: Mar 09, 2012
+Owner	: arul
+Project	: red5Demo
+Contact	: http://www.arulraj.net
+Description :
+History	:
+-->
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:skin="com.demo.skin.*"
+		 xmlns:graphics="com.demo.graphics.*"
+		 creationComplete="onCreationComplete(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.demo.graphics.Visualizr;
+			import com.demo.skin.BackgroundSkin;
+			import com.demo.utils.DemoConstants;
+			
+			import mx.core.FlexGlobals;
+			import mx.core.IUIComponent;
+			import mx.events.FlexEvent;
+
+			[Embed(source="../../../../assets/audio/play.png")]
+			private static const PLAY:Class;
+			
+			[Embed(source="../../../../assets/audio/stop.png")]
+			private static const STOP:Class;
+			
+			[Embed(source="../../../../assets/audio/volume.png")]
+			private static const UNMUTE:Class;
+			
+			[Embed(source="../../../../assets/audio/mute.png")]
+			private static const MUTE:Class;		
+			
+			[Embed(source="../../../../assets/maximize.png")]
+			private static const MAXIMIZE:Class;
+			
+			[Embed(source="../../../../assets/restore.png")]
+			private static const MINIMIZE:Class;			
+			
+			[Embed(source="../../../../assets/audio/logo.png")]
+			private static const LOGO:Class;
+			
+			private var selectedMusicVis:IUIComponent;
+			
+			private var selectedIndex:int = 0;
+			
+			protected function onCreationComplete(event:FlexEvent=null):void
+			{
+				this.selectedIndex = 0;
+				selectedMusicVis = visualizr;
+			}
+
+			protected function togglePlay(event:MouseEvent):void
+			{
+				if(playIcon.toolTip == 'Play') {
+					playIcon.source = STOP;
+					playIcon.toolTip = 'Stop';
+					FlexGlobals.topLevelApplication.audioConn.playLiveStream();
+				} else {
+					playIcon.source = PLAY;
+					playIcon.toolTip = 'Play';
+					FlexGlobals.topLevelApplication.audioConn.pauseLiveStream();
+				}
+			}
+
+			protected function toggleMute(event:MouseEvent):void
+			{
+				if(volumeIcon.toolTip == "Mute") {
+					FlexGlobals.topLevelApplication.audioConn.changeSpeakarVolume(0);
+					volumeIcon.source = MUTE;
+					volumeIcon.toolTip = "Unmute";
+				} else {
+					FlexGlobals.topLevelApplication.audioConn.changeSpeakarVolume(volumeSlider.value);
+					volumeIcon.source = UNMUTE;
+					volumeIcon.toolTip = "Mute";
+				}
+			}
+
+			protected function onVolumeChange(event:Event):void
+			{
+				FlexGlobals.topLevelApplication.audioConn.changeSpeakarVolume(volumeSlider.value);
+				toggleVisualizer();
+				if(volumeSlider.value == 0) {
+					
+				} else {
+					
+				}				
+			}
+
+			/**
+			* Changes music visualization type.
+			*/
+			public function toggleVisualizer():void
+			{
+				if (musicVis.type == "line")
+				{
+					musicVis.type = "wave";
+				}
+				else if (musicVis.type == "wave")
+				{
+					musicVis.type = "bars";
+				}
+				else
+				{
+					musicVis.type = "line";
+				}
+				musicVis.invalidateDisplayList();
+			}
+			
+			protected function toggleFullVisualizer(index:int = -1):void
+			{
+				if (index >=0 && index < (titleGroupFull.numChildren - 1))
+				{
+					// select the specivied music vis
+					this.selectedIndex = index;
+				}
+				else if (this.selectedIndex < (titleGroupFull.numChildren -1))
+				{
+					// select the next music visualizer					
+					this.selectedIndex++;
+				}
+				else	
+				{
+					// show the first music vis
+					this.selectedIndex = 0;
+				}
+				
+				// determine the next music visualizer
+				var nextVisualizer:IUIComponent;				
+				switch (this.selectedIndex)
+				{
+					case 0:
+						nextVisualizer = visualizr;
+						break;											
+					case 1:
+						nextVisualizer = smoothSpectrum;
+						break;
+					// Note: add a case for the other music visualizers here
+				}
+				
+				if (nextVisualizer != selectedMusicVis)
+				{
+					// NOTE: make sure rendering is disabled in your music vis.,
+					// when your visualizer is not enabled
+					// to save those preciouse CPU cycles 
+					// and skip all the bitmapdata and 
+					// blur filter changes that nobody will see :)
+					
+					// change selected visualizer					
+					nextVisualizer.enabled = true;
+					nextVisualizer.visible = true;
+					selectedMusicVis.enabled = false;
+					selectedMusicVis.visible = false;
+					selectedMusicVis = nextVisualizer;
+				}
+			}
+			
+			/**
+			 * Toggle full screen
+			 */
+			public function toggleFullscreen(event:MouseEvent):void {
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+				FlexGlobals.topLevelApplication.toggleFullscreen(event);
+			}
+			
+			private function fullScreenHandler(event:FullScreenEvent):void {
+				if(event.fullScreen) {
+					fullScreenIcon.source = MINIMIZE;
+					this.currentState = "fullscreen";
+				}else {
+					fullScreenIcon.source = MAXIMIZE;
+					this.currentState = "normal";
+				}
+			}			
+
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout gap="0" verticalAlign="middle" horizontalAlign="center" />
+	</s:layout>
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="fullscreen" />
+	</s:states>
+	
+	<s:Group id="titleGroup" width="{playerControls.width}" height="32" includeIn="normal">
+		<!--<s:Rect x="0" y="0" 
+				radiusX="4" radiusY="4" 
+				height="100%" width="100%">
+			<s:fill>
+				<s:BitmapFill source="@Embed('../../../../assets/audio/title-background.png'" fillMode="repeat" />
+			</s:fill>
+		</s:Rect>-->
+		<graphics:Visualization id="musicVis" 
+			width="100%" height="100%"
+			useHandCursor="true" 
+			buttonMode="true"                                 
+			audioLineColor="#00A9FF" 
+			audioFillColor="#0066CC" 
+			type="wave" bars="48" 
+			channel="stereo" 
+			click="toggleVisualizer()" 
+			toolTip="Change Visualization"                
+			visible="true"/>		
+	</s:Group>
+	
+	<s:Group id="titleGroupFull" includeIn="fullscreen"
+			 width="100%" height="100%" 
+			 useHandCursor="true"
+			 buttonMode="true"
+			 initialize="onCreationComplete()"
+			 creationComplete="toggleFullVisualizer(0)"
+			 click="toggleFullVisualizer()"
+			 toolTip="Change Visualization">
+		<graphics:Visualizr id="visualizr" width="100%" height="100%" />
+		<graphics:SmoothSpectrum id="smoothSpectrum"
+							 width="100%" height="100%" />		
+	</s:Group>	
+	
+	<s:SkinnableContainer id="playerControls" skinClass="com.demo.skin.BackgroundSkin"
+						  height="30">
+		<s:layout>
+			<s:HorizontalLayout gap="10" verticalAlign="middle" paddingLeft="10" paddingRight="10" />
+		</s:layout>
+		<mx:Image id="playIcon" source="{PLAY}" toolTip="Play" 
+			useHandCursor="true" 
+			buttonMode="true"    
+			click="togglePlay(event)" />	
+		<mx:Image id="volumeIcon" source="{UNMUTE}" toolTip="Mute" 
+			useHandCursor="true" 
+			buttonMode="true"    
+			click="toggleMute(event)" />
+		<s:HSlider id="volumeSlider" toolTip="FM Volume" value="{DemoConstants.DEFAULT_SPEAKER_VOLUME}" 
+			skinClass="com.demo.skin.VolumeSlider"
+			minimum="1" maximum="100" snapInterval="1" stepSize="1" 
+			useHandCursor="true" 
+			buttonMode="true"
+			change="onVolumeChange(event)" >
+		</s:HSlider>
+		<mx:Image id="fullScreenIcon" source="{MAXIMIZE}" toolTip="Maximize" 
+				  useHandCursor="true" 
+				  buttonMode="true"    
+				  click="toggleFullscreen(event)" />		
+		<mx:Image source="{LOGO}"/>
+	</s:SkinnableContainer>
+	
+</s:Group>

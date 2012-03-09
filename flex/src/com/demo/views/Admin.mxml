@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File	: Admin.mxml
+Date	: Mar 09, 2012
+Owner	: arul
+Project	: red5Demo
+Contact	: http://www.arulraj.net
+Description :
+History	:
+-->
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.demo.utils.DemoConstants;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			
+			import spark.events.IndexChangeEvent;
+			
+			private var timer:Timer;
+			private var spectrumBA:ByteArray;
+			
+			private static var LOG:ILogger = Log.getLogger('Admin.mxml');
+			
+			[Bindable]
+			private var application:Object = FlexGlobals.topLevelApplication;			
+			
+			private function controlChange(event:IndexChangeEvent):void{
+				var optionString:String;
+				// "selectedItem" won't appear in code completion
+				optionString = (event.target.selectedItem).toString();
+				
+				switch(optionString){
+					case "Play":
+						play();
+						break;
+					case "Pause":
+						pause();
+						break;
+					case "Stop":
+						stop();
+						break;
+					default:
+						break;
+				}
+			}
+			
+			private function play():void {
+				FlexGlobals.topLevelApplication.playerConn.playLiveStream();
+			}
+			
+			private function pause():void {
+				FlexGlobals.topLevelApplication.playerConn.pauseLiveStream();
+			}
+			
+			private function stop():void {
+				
+			}
+			
+			private function checkTrack(event:Event):void{
+				// manage spectrum graphic
+				SoundMixer.computeSpectrum(spectrumBA, true, 0);
+			}
+			
+			private function onFMVolumeChange(value:uint):void {
+				FlexGlobals.topLevelApplication.audioConn.changeMicVolume(value);
+			}		
+			
+			private function onVideoVolumeChange(value:uint):void {
+				FlexGlobals.topLevelApplication.videoConn.changeMicVolume(value);
+			}			
+
+			protected function onCreationComplete(event:FlexEvent):void
+			{
+				// timer for 10ths of a second (100 milliseconds)
+				timer = new Timer(100);
+				timer.addEventListener(TimerEvent.TIMER, checkTrack);
+			}
+
+
+			/*protected function onFMPublishClick(event:MouseEvent):void
+			{
+				fmPublishButton.label = "Publishing...";
+				FlexGlobals.topLevelApplication.audioConn.publishLiveAudio();
+			}
+			
+			protected function onFMStopClick(event:MouseEvent):void
+			{
+				fmPublishButton.label = "Stopping...";
+				FlexGlobals.topLevelApplication.audioConn.stopLiveAudio();
+				fmPublishButton.label = "Publish";
+			}*/
+			
+			protected function onVideoPublishClick(event:MouseEvent):void
+			{
+				videoPublishButton.label = "Publishing...";
+				FlexGlobals.topLevelApplication.videoConn.publishLiveVideo();
+			}
+			
+			protected function onVideoStopClick(event:MouseEvent):void
+			{
+				videoPublishButton.label = "Stopping...";
+				FlexGlobals.topLevelApplication.videoConn.stopLiveVideo();
+				videoPublishButton.label = "Publish";
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:ArrayCollection id="controlBarAC" source="['Play', 'Pause']"/>		
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout verticalAlign="top"/>
+	</s:layout>
+	<!--<s:Label text="Select FM Input : "/>
+	<s:HGroup>
+		<s:DropDownList id="fmMicNames" dataProvider="@{application.demoSettings.micArray}" 
+						selectedIndex="@{application.demoSettings.fmMicSelectedItem}" />
+		<s:HSlider id="fmVolumeSlider" change="onFMVolumeChange(fmVolumeSlider.value)" toolTip="FM Volume" 
+				   minimum="1" maximum="100" snapInterval="1" stepSize="1" value="@{application.demoSettings.fmVolume}" />
+	</s:HGroup>
+	<s:Button id="fmPublishButton" click="{fmPublishButton.label == 'Publish'? onFMPublishClick(event) : onFMStopClick(event)}" label="Publish" />-->
+	
+	<s:Label text="Publish Your Video : "/>
+	<s:HGroup>
+		<s:DropDownList id="cameraNames" dataProvider="@{application.demoSettings.cameraArray}" 
+						selectedIndex="@{application.demoSettings.videoMicSelectedItem}" />		
+		<s:DropDownList id="videoMicNames" dataProvider="@{application.demoSettings.micArray}" 
+						selectedIndex="@{application.demoSettings.camSelectedName}" />
+		<s:HSlider id="videoVolumeSlider" change="onVideoVolumeChange(videoVolumeSlider.value)" toolTip="Video Volume" 
+				   minimum="1" maximum="100" snapInterval="1" stepSize="1" value="@{application.demoSettings.videoVolume}" />				
+	</s:HGroup>
+	
+	<s:Group>
+		<s:SkinnableContainer id="liveVideoSkin" 
+							  height="{liveVideoDisplay.height}" width="{liveVideoDisplay.width}"
+							  skinClass="com.demo.skin.VideoDisplaySkin">
+		</s:SkinnableContainer>	
+		<s:VideoDisplay id="liveVideoDisplay" name="liveVideoDisplay"
+						width="{DemoConstants.ADMIN_VIDEO_WIDTH}" height="{DemoConstants.ADMIN_VIDEO_HEIGHT}">
+		</s:VideoDisplay>		
+	</s:Group>
+	
+	<s:Button id="videoPublishButton" click="{videoPublishButton.label == 'Publish'? onVideoPublishClick(event) : onVideoStopClick(event)}" label="Publish" />
+</s:Group>

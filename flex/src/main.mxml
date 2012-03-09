@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+	File	: main.mxml
+	Date	: Mar 09, 2012
+	Owner	: arul
+	Project	: red5Demo
+	Contact	: http://www.arulraj.net
+	Description :
+	History	:
+-->
+
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:model="com.demo.models.*" 
+			   xmlns:components="com.demo.components.*"
+			   xmlns:views="com.demo.views.*"
+			   xmlns:local="*"
+			   name="red5Demo"
+			   preinitialize="initVars()"
+			   initialize="initApps()"
+			   creationComplete="creationComplete()" 
+			   minWidth="400" minHeight="400">
+	<s:layout>
+		<s:VerticalLayout id="mainLayout" verticalAlign="top" horizontalAlign="center" gap="5"
+						  paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
+	</s:layout>
+	<s:states >
+		<s:State name="admin" />
+		<s:State name="player" />
+		<s:State name="anonymous" />
+	</s:states>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Parallel id="showEffect">
+			<s:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" />
+		</s:Parallel>
+		<s:Parallel id="hideEffect">
+			<s:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" />		
+		</s:Parallel>
+		<mx:DateFormatter id="dateFormatter" formatString="MMM. DD, YYYY at L:NN:SS A" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			import com.demo.components.InfoPopup;
+			import com.demo.connection.*;
+			import com.demo.models.*;
+			import com.demo.utils.*;
+			import com.demo.utils.DemoConstants;
+			import com.demo.utils.DemoEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.events.PropertyChangeEvent;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			import mx.logging.LogEventLevel;
+			import mx.logging.targets.TraceTarget;
+			import mx.managers.PopUpManager;
+			import mx.utils.URLUtil;
+			
+			private static var LOG:ILogger = Log.getLogger('main.mxml');
+			
+			[Bindable]
+			public var hostname:String;
+			[Bindable]
+			public var rtmpPort:Number;
+			[Bindable]
+			public var issecure:Boolean;
+
+			[Bindable]
+			public var publicConn:PublicConnection;
+
+			[Bindable]
+			public var videoConn:VideoConnection;
+			
+			[Bindable]
+			public var audioConn:AudioConnection;
+
+			[Bindable]
+			public var demoUser:User;
+			
+			[Bindable]
+			public var demoChannel:Channel;
+			
+			[Bindable]
+			public var demoSettings:Settings;
+			
+			[Bindable]
+			public var chatmessage:ChatMessage;
+			
+			[Bindable]
+			public var playerType:String;
+			
+			private var mainResponder:Responder;
+
+			private var connectingPopup:InfoPopup;
+			
+			private function initVars():void {
+				initExternalInterface();
+				demoUser = new User(DemoConstants.GUEST_ID);
+				demoChannel = new Channel(DemoConstants.GUEST_ID);
+				demoSettings = new Settings();
+				chatmessage = new ChatMessage();
+				mainResponder = new Responder(onRemoteCallSuccess, onRemoteCallFail);
+			}
+			
+			private function initExternalInterface():void {
+				ExternalInterface.addCallback("updateUserInfoJS",updateUserInfoJS);
+				ExternalInterface.addCallback("updateChannelInfoJS",updateChannelInfoJS);
+				ExternalInterface.addCallback("sendGroupMessageJS",sendGroupMessageJS);
+			}
+			
+			private function initApps():void {
+				initLogging();
+			}
+			
+			private function creationComplete():void {
+				/*Getting the user valus*/
+				autoCallUpdateUser();
+				autoCallUpdateChannel();
+							
+				getURLDetails();
+				initConnection();
+				initListener();
+			}
+			
+			private function initConnection():void {
+				publicConn = new PublicConnection();
+				videoConn = new VideoConnection();
+				audioConn = new AudioConnection();
+				publicConn.getConnection();
+			}
+			
+			private function initMediaConnection(event:DemoEvent):void {
+				LOG.debug(event.type);
+				if(event.type == DemoEvent.PUBLIC_CONN_SUCCESS) {
+					hideConnectingPopup();
+					videoConn.getConnection();
+				}
+				
+				if(event.type == DemoEvent.VIDEO_CONN_SUCCESS) {
+					hideConnectingPopup();
+					audioConn.getConnection();
+				}
+				
+				if(event.type == DemoEvent.AUDIO_CONN_SUCCESS) {
+					hideConnectingPopup();
+				}
+				
+				LOG.debug("publicConn.connected : "+publicConn.connected+
+					" videoConn.connected : "+videoConn.connected+ " audioConn.connected : " + audioConn.connected);
+			}
+			
+			/**
+			 * Public functions 
+			 */
+			 
+
+			/**
+			 * RPC functions
+			 */
+			public function updateRed5User():void {
+				publicConn.call("updateUserInfo", mainResponder, this.demoUser);
+			}
+			
+			public function updateRed5Channel():void {
+				publicConn.call("updateChannelInfo", mainResponder, this.demoChannel);
+			}			
+			
+			public function sendGroupMessage(message:ChatMessage):void {
+				LOG.debug("send group a message");
+				if(demoChannel.enabled && audioConn.connected){
+					if(audioConn.chatSO != null) {
+						audioConn.call("sendGroupMessage", mainResponder, demoUser.id, demoChannel.id , message);
+					}
+				}
+			}			
+			
+			public function next():void {
+				publicConn.call("next", mainResponder);
+			}
+			/**
+			 * Listener functions
+			 */
+			private function initListener():void {
+				publicConn.addEventListener(DemoEvent.PUBLIC_CONN_CONNECTING,showConnectingPopup);
+				videoConn.addEventListener(DemoEvent.VIDEO_CONN_CONNECTING,showConnectingPopup);
+				audioConn.addEventListener(DemoEvent.AUDIO_CONN_CONNECTING,showConnectingPopup);
+				
+				publicConn.addEventListener(DemoEvent.PUBLIC_CONN_SUCCESS,initMediaConnection);
+				videoConn.addEventListener(DemoEvent.VIDEO_CONN_SUCCESS, initMediaConnection);
+				audioConn.addEventListener(DemoEvent.AUDIO_CONN_SUCCESS, initMediaConnection);
+				
+				publicConn.addEventListener(DemoEvent.PUBLIC_CONN_FAILED,showConnectionFailed);
+				videoConn.addEventListener(DemoEvent.VIDEO_CONN_FAILED, showConnectionFailed);
+				audioConn.addEventListener(DemoEvent.AUDIO_CONN_FAILED, showConnectionFailed);
+			}
+			
+			private function showConnectionFailed(event:DemoEvent):void {
+				var errorPopup:InfoPopup = InfoPopup(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as Application, InfoPopup, true));
+				errorPopup.title = "Error";
+				if (event.type == DemoEvent.PUBLIC_CONN_FAILED) {
+					hideConnectingPopup();
+					errorPopup.infoLabel.text = "Error in establishing public connection. Please try agian.";
+				} else if (event.type == DemoEvent.VIDEO_CONN_FAILED) {
+					errorPopup.infoLabel.text = "Error in establishing video connection. Please try agian.";
+				} else if (event.type == DemoEvent.AUDIO_CONN_FAILED) {
+					errorPopup.infoLabel.text = "Error in establishing audio connection. Please try agian.";
+				}
+				PopUpManager.centerPopUp(errorPopup);				
+			}
+			
+			private function showConnectingPopup(event:DemoEvent):void {
+				connectingPopup = InfoPopup(PopUpManager.createPopUp(FlexGlobals.topLevelApplication as Application, InfoPopup, true));
+				connectingPopup.title = "Status";
+				connectingPopup.infoLabel.text = "Connecting...";
+				PopUpManager.centerPopUp(connectingPopup);
+			}
+			
+			private function hideConnectingPopup():void {
+				PopUpManager.removePopUp(connectingPopup);
+			}
+			
+			/**
+			 * Toggle full screen
+			 */
+			public function toggleFullscreen(event:MouseEvent):void {
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+				switch (stage.displayState) {
+					case StageDisplayState.FULL_SCREEN:
+						stage.scaleMode = StageScaleMode.NO_SCALE;
+						stage.displayState = StageDisplayState.NORMAL;
+						break;
+					
+					case StageDisplayState.NORMAL:
+						stage.scaleMode = StageScaleMode.NO_SCALE;
+						stage.displayState = StageDisplayState.FULL_SCREEN;	
+						break;
+				}
+			}
+			
+			private function fullScreenHandler(event:FullScreenEvent):void {
+				if(event.fullScreen) {
+					stage.scaleMode = StageScaleMode.NO_SCALE;
+					stage.displayState = StageDisplayState.FULL_SCREEN;	
+				}else {
+					stage.scaleMode = StageScaleMode.NO_SCALE;
+					stage.displayState = StageDisplayState.NORMAL;
+				}
+			}			
+			
+			private function onRemoteCallSuccess(object:Object=null):void {
+				//LOG.debug("RPC call success "+object != null ? object.toString() : null);
+			}
+			
+			private function onRemoteCallFail(object:Object=null):void {
+				LOG.debug("RPC call failed "+object != null ? object.toString() : null);
+			}		
+			
+			/**
+			 * Call From javascript 
+			 */
+			public function updateUserInfoJS(loginName:String, displayName:String, place:String, broadcastTime:Number):void {
+				this.demoUser.loginName = loginName;
+				this.demoUser.displayName = displayName;
+				this.demoUser.place = place;
+				this.demoUser.broadcastTime = broadcastTime;
+			}
+			
+			public function updateChannelInfoJS(title:String, description:String):void {
+				this.demoChannel.title = title;
+				this.demoChannel.description = description;
+				//updateRed5Channel();
+			}
+			
+			public function sendGroupMessageJS(message:String):void {
+				this.chatmessage.from = demoUser.displayName;
+				this.chatmessage.userId = demoUser.id;
+				this.chatmessage.message = message;
+				this.chatmessage.date = new Date();
+				sendGroupMessage(chatmessage);
+			}
+			
+			public function receiveGroupMessage(message:Object):void {
+				ExternalInterface.call("receiveGroupMessage", JSON.encode(message));
+			}
+			
+			public function autoCallUpdateUser():void {
+				ExternalInterface.call("updatedemoUser");
+			}			
+			
+			public function autoCallUpdateChannel():void {
+				ExternalInterface.call("updatedemoChannel");
+			}			
+			
+			/**
+			 * Common functions
+			 */ 
+			private function getURLDetails():void {
+				var url:String = this.url;
+				var flashvars:Object = this.parameters;
+				var red5server:String = flashvars["red5server"];
+				var secure:String = flashvars["secure"];
+				var red5port:String = flashvars["red5port"];
+				var role:String = flashvars["role"];
+				var playerType:String = flashvars["playerType"];
+				var channelName:String = flashvars["channelName"];
+				
+				var fullURL:String = URLUtil.getFullURL(url, url);
+				var port:int = URLUtil.getPort(url);
+				var protocol:String = URLUtil.getProtocol(url);
+				if(red5server == null) {
+					this.hostname = URLUtil.getServerName(url);
+				} else {
+					this.hostname = red5server;
+				}
+				if(secure == null) {
+					this.issecure = URLUtil.isHttpsURL(url);
+				} else {
+					this.issecure = secure as Boolean;
+				}
+				
+				if(red5port == null) {
+					this.rtmpPort = DemoConstants.RTMP_PORT;
+				} else {
+					this.rtmpPort = red5port as Number;
+				}
+				
+				
+				if(role == null) {
+					this.demoUser.role = DemoConstants.DEFAULT_ROLE;
+					this.currentState = this.demoUser.role.name;
+				} else {
+					this.demoUser.role = CommonUtility.getRole(role);
+					this.currentState = this.demoUser.role.name;
+				}
+				
+				if(playerType == null) {
+					this.playerType = "video";
+				} else {
+					this.playerType = playerType;
+				}
+				
+				if(channelName == null) {
+					this.demoChannel.id = "1";
+					this.demoChannel.channelName = "1";
+				} else {
+					this.demoChannel.id = channelName;
+					this.demoChannel.channelName = channelName;
+				}
+				
+				if(this.demoUser.role == Role.ANONYMOUS) {
+					mainLayout.horizontalAlign = "left";
+				}				
+							
+				LOG.debug("Hostname : "+red5server+" Port : "+red5port+" Secure : "+issecure);
+				LOG.debug("role : "+role+ " playerType : "+ playerType +" channelName : "+channelName);
+			}
+			
+			private function initLogging():void {
+				// Create a target.
+				var logTarget:TraceTarget = new TraceTarget();
+				
+				// Log only messages for the following packages			
+				logTarget.filters=["*","main.mxml","Admin.mxml","Player.mxml","com.demo.components.*","com.demo.skin.*",
+					"com.demo.connection.*","com.demo.models.*","com.demo.utils.*", "com.demo.views.*"];
+				
+				// Log all log levels.
+				logTarget.level = LogEventLevel.ALL;
+				
+				// Add date, time, category, and log level to the output.
+				logTarget.includeDate = true;
+				logTarget.includeTime = true;
+				logTarget.includeCategory = true;
+				logTarget.includeLevel = true;
+				
+				// Begin logging.
+				Log.addTarget(logTarget);
+			}			
+			
+		]]>
+	</fx:Script>
+	<views:Admin id="adminView" includeIn="admin" visible="{demoUser.role==Role.ADMIN ? true : false}" includeInLayout="{adminView.visible}" height="100%" width="100%"/>
+	<views:Player id="playerView" includeIn="player" visible="{demoUser.role==Role.PLAYER ? true : false}" includeInLayout="{playerView.visible}" height="100%" width="100%"/>
+</s:Application>
