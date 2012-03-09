@@ -1,0 +1,9 @@
+**/*~
+*.*~
+*.bak
+/flex/build
+/java/build
+/dist
+/resources/ant/buildlogs
+*.class
+*.log
