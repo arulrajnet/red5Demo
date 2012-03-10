@@ -1,0 +1,77 @@
+#!/bin/bash
+# For RedHat and cousins:
+# chkconfig: 2345 85 85
+# description: This is used to start, stop, restart and status of red5
+# processname: red5
+# Created By: Arul - www.arulraj.net
+ 
+export RED5_HOME=/usr/local/red5
+PID=0
+RTMPPORT=1935
+prog="red5"
+ 
+start(){
+ status
+ if [ $PID -eq 0 ] ; then
+ echo $"Starting $prog..."
+ nohup $RED5_HOME/red5.sh 1> $RED5_HOME/log/stdout.log 2> $RED5_HOME/log/stderr.log < /dev/null &
+ PID=$!
+ echo $"$prog started at port $RTMPPORT and PID[$PID]."
+ else
+ echo
+ fi
+ return $PID
+}
+ 
+stop(){
+ status
+ if [ $PID -eq 0 ] ; then
+ echo
+ else
+ echo $"Stopping $prog..."
+ $RED5_HOME/red5-shutdown.sh
+ echo $"PID[$PID] is killed."
+ fi
+ return $PID
+}
+ 
+restart(){
+ stop
+ sleep 2
+ start
+}
+ 
+status() {
+ RTMPPORT=`cat $RED5_HOME/conf/red5.properties | grep -w "rtmp.port" | awk -F= '{print $2}'`
+ #PID=`lsof -i | grep java | grep *:$RTMPPORT | awk '{print $2}'`
+ PID=`ps -ef | grep red5 | grep java | awk '{print $2}'`
+ if [ x"$PID" == "x" ] ; then
+ PID=0
+ echo $"$prog is not running."
+ else
+ echo $"$prog running on port $RTMPPORT and PID[$PID]."
+ fi
+ return $PID
+}
+ 
+# How its called.
+case "$1" in
+ start)
+ start
+ ;;
+ stop)
+ stop
+ ;;
+ status)
+ status
+ ;;
+ restart)
+ restart
+ ;;
+ *)
+ echo $"Usage: $0 {start|stop|status|restart}"
+ PID=1
+esac
+ 
+exit $PID
+
