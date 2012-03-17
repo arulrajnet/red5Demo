@@ -24,10 +24,30 @@
 			</Pattern>
 		</layout>
 	</appender>
+	
+	<appender name="ROLLINGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/var/log/red5/red5Demo.log</File>
+		<Append>true</Append>
+		<Encoding>UTF-8</Encoding>
+		<BufferedIO>false</BufferedIO>
+		<ImmediateFlush>true</ImmediateFlush>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/var/log/red5/red5Demo.%d{yyyy-MM-dd}.gz</FileNamePattern>
+			<!-- keep 30 days worth of history -->
+			<MaxHistory>30</MaxHistory>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%date [%thread] %-5level %logger{35} - %msg%n
+			</Pattern>
+		</layout>
+	</appender>		
+	
 	<root>
 		<level ref="DEBUG" />
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE" />
+		<appender-ref ref="ROLLINGFILE" />
 	</root>	
 	<logger name="com.demo.application">
 		<level value="DEBUG" />

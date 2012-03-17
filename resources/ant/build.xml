@@ -2,7 +2,8 @@
 <project name="red5Demo" default="development" basedir=".">
 
 	<!-- Load Environment specific properties from properties file -->
-	<property file="build.properties" />
+	<dirname property="red5Demo.basedir" file="${ant.file.imported}"/>
+	<property file="${red5Demo.basedir}/build.properties"/>
 	<property environment="env" />
 	
 	<fail unless="env.FLEX_HOME" message="FLEX_HOME needs to be defined as an environment variable or in the Ant build." />

@@ -14,7 +14,6 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-/*Copyright(c) arulraj.net 2011*/
 /**
  * @author Arul
  *

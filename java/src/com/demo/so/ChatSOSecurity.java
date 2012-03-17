@@ -11,6 +11,7 @@ package com.demo.so;
 
 import java.util.List;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.IScope;
 import org.red5.server.api.so.ISharedObject;
 import org.red5.server.api.so.ISharedObjectListener;
@@ -18,7 +19,6 @@ import org.red5.server.api.so.ISharedObjectSecurity;
 import org.red5.server.api.so.ISharedObjectService;
 import org.red5.server.so.SharedObjectService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.red5.server.api.ScopeUtils.getScopeService;
 
@@ -30,7 +30,7 @@ import com.demo.utils.DemoConstants;
  */
 public class ChatSOSecurity implements ISharedObjectSecurity {
 
-  private final static Logger LOG = LoggerFactory.getLogger(ChatSOSecurity.class);
+  private final static Logger LOG = Red5LoggerFactory.getLogger(ChatSOSecurity.class, DemoConstants.APP_NAME);
   
   /* (non-Javadoc)
    * @see org.red5.server.api.so.ISharedObjectSecurity#isConnectionAllowed(org.red5.server.api.so.ISharedObject)

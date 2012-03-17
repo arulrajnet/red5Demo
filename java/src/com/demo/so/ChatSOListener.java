@@ -12,11 +12,13 @@ package com.demo.so;
 import java.util.List;
 import java.util.Map;
 
+import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.IAttributeStore;
 import org.red5.server.api.so.ISharedObjectBase;
 import org.red5.server.api.so.ISharedObjectListener;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.demo.utils.DemoConstants;
 
 
 /**
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ChatSOListener implements ISharedObjectListener {
   
-  private final static Logger LOG = LoggerFactory.getLogger(ChatSOListener.class);
+  private final static Logger LOG = Red5LoggerFactory.getLogger(ChatSOListener.class, DemoConstants.APP_NAME);
   
   private String soName;
   

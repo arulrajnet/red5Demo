@@ -33,7 +33,7 @@ import com.demo.model.User;
  */
 public class CommonUtility {
 	
-	private final static Logger LOG = Red5LoggerFactory.getLogger(CommonUtility.class);
+	private final static Logger LOG = Red5LoggerFactory.getLogger(CommonUtility.class, DemoConstants.APP_NAME);
 	
 	private final static CommonUtility INSTANCE = new CommonUtility();
 	

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mainbuild" default="build" basedir=".">
+
+	<import file="resources/ant/build.xml"/>
+
+	<target name="build" depends="usage, development">
+		<echo>main-build called.</echo>
+	</target>
+</project>

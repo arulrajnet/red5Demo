@@ -43,7 +43,7 @@ import com.demo.utils.DemoConstants;
 public class Application extends MultiThreadedApplicationAdapter implements
 		IPendingServiceCall, IStreamAwareScopeHandler {
 
-	static final Logger LOG = Red5LoggerFactory.getLogger(Application.class);
+	static final Logger LOG = Red5LoggerFactory.getLogger(Application.class, DemoConstants.APP_NAME);
 	LinkedHashMap<String, User> usersMap = null;
 	LinkedHashMap<String, Channel> channelsMap = null;
 	LinkedHashMap<String, Connection> connectionsMap = null;

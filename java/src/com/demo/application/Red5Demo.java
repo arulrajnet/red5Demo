@@ -41,7 +41,7 @@ import com.demo.utils.DemoConstants;
  */
 public class Red5Demo extends Application {
 
-	static final Logger LOG = Red5LoggerFactory.getLogger(Red5Demo.class);
+	static final Logger LOG = Red5LoggerFactory.getLogger(Red5Demo.class, DemoConstants.APP_NAME);
 	
 	static IScope staticScope;
 	
