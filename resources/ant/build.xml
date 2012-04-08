@@ -240,13 +240,8 @@
 			</fileset>
 			<fileset dir="${flex.build.dir}" />
 		</copy>
-		<copy todir="${dist.dir}/WEB-INF">
-			<fileset dir="${java.dir}/WEB-INF" />
-		</copy>
-		<copy todir="${dist.dir}/WEB-INF/lib">
-			<fileset dir="${java.dir}/lib" >
-				<exclude name="red5.jar"/>
-			</fileset>
+		<copy todir="${dist.dir}">
+			<fileset dir="${java.dir}/webapp" />
 		</copy>
 		<copy todir="${dist.dir}/WEB-INF/classes">
 			<fileset dir="${java.build.dir}" />
@@ -261,7 +256,7 @@
 		<war destfile="${dist.dir}/${application.name}.war" webxml="${dist.dir}/WEB-INF/web.xml">
 			<fileset dir="${dist.dir}">
 			</fileset>
-			<lib dir="${java.dir}/lib"/>
+			<lib dir="${java.lib.dir}"/>
 			<manifest>
 				<attribute name="Built" value="${build.TODAY} by ${author}"/>
 				<attribute name="Build-OS" value="${os.name} ${os.version}"/>
@@ -295,7 +290,7 @@
 		<tstamp prefix="build">
 			<format property="TODAY" pattern="dd-MMMM-yyyy hh:mm:ss aa" locale="en"/>
 		</tstamp>
-		<echo>Production server builded on ${build.TODAY}...</echo>
+		<echo>Production server(${production.server}) builded on ${build.TODAY}...</echo>
 	</target>
 	
 	<target name="usage">

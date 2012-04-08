@@ -1,0 +1,49 @@
+html,body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  text-align: left;
+  background-color: #FFFFFF;
+}
+
+object:focus {
+  outline: none;
+}
+
+#flashContent {
+  display: none;
+}
+
+#htmlContent {
+  float: left;
+  font-weight: normal;
+  text-align: center;
+  margin: 0 0 0 6px;
+  display: inline;
+  padding: 0;
+}
+
+#appletContent {
+
+}
+
+#clear {
+  clear: both;
+}
+
+span {
+  width: 99%;
+  height: auto;
+  float: left;
+  color: #CCC;
+  text-align: center;
+  font-size: 11px;
+  font-weight: normal;
+  margin: 0 0 0 6px;
+  display: inline;
+  padding: 0;
+}

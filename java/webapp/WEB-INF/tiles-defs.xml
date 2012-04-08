@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+ "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+ "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+  <!--  layouts -->
+  <definition name="application" template="/WEB-INF/jsp/layouts/application.jsp">
+    <put-attribute name="header" value="/WEB-INF/jsp/tiles/shared/header.jsp"/>
+    <put-attribute name="footer" value="/WEB-INF/jsp/tiles/shared/footer.jsp"/>
+  </definition>
+  
+  <!-- Home -->
+  <definition name="main.home" extends="application">
+  	<put-attribute name="body" value="/WEB-INF/jsp/tiles/home/body.jsp"></put-attribute>
+  </definition>
+  
+  <!-- Error messages -->
+  <definition name="errors.notfound" template="/WEB-INF/jsp/layouts/application_error.jsp">
+    <put-attribute name="body" value="/WEB-INF/jsp/tiles/errors/404.jsp" cascade="true"/>
+  </definition>
+  
+  <definition name="errors.error" template="/WEB-INF/jsp/layouts/application_error.jsp">
+    <put-attribute name="body" value="/WEB-INF/jsp/tiles/errors/500.jsp" cascade="true"/>
+  </definition>
+  
+  <definition name="errors.suspended" template="/WEB-INF/jsp/layouts/application_error.jsp">
+    <put-attribute name="body" value="/WEB-INF/jsp/tiles/errors/suspended.jsp" cascade="true"/>
+  </definition>
+  
+  <definition name="errors.comingsoon" template="/WEB-INF/jsp/layouts/application_error.jsp">
+    <put-attribute name="body" value="/WEB-INF/jsp/tiles/errors/comingsoon.jsp" cascade="true"/>
+  </definition>  
+  
+  <definition name="errors.emptypage">
+  </definition>  
+  
+</tiles-definitions>

@@ -8,8 +8,14 @@
 		<property name="videoAllowed" value="true"/>
 	</bean>
 	
-	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	    <property name="location" value="/WEB-INF/red5Demo-web.properties" />
+	<bean id="placeholderConfig" class="com.demo.utils.PropertiesUtil">
+    <property name="searchSystemEnvironment" value="true"></property>
+    <property name="ignoreResourceNotFound" value="true"></property>	
+		<property name="locations">
+			<list>
+				<value>/WEB-INF/red5Demo.properties</value>			
+			</list>
+		</property>
 	</bean>
 	
 	<bean id="web.context" class="org.red5.server.Context" 
