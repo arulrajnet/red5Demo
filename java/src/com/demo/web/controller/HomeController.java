@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/home")
 public class HomeController extends AbstractBaseController {
   
-  @RequestMapping(value= "/", method=RequestMethod.GET)
+  @RequestMapping(value= {"","/"}, method=RequestMethod.GET)
   public String home(ModelMap model) {
     model.addAttribute("pageTitle", "Home");
     return "main.home";

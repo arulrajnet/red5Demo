@@ -44,7 +44,7 @@
 	</appender>		
 	
 	<root>
-		<level ref="DEBUG" />
+		<level ref="INFO" />
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE" />
 		<appender-ref ref="ROLLINGFILE" />
