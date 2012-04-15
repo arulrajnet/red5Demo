@@ -43,6 +43,7 @@ public class AbstractBaseController implements HandlerExceptionResolver {
     String errorRefNumber = Long.toString(System.currentTimeMillis());
     request.setAttribute("errorRefNumber", errorRefNumber);
     viewData.addObject("exception", exception);
+    LOG.error(exception.toString());
     LOG.error("### Error-Reference-Number " + errorRefNumber);
     
     String viewName = "errors.error";

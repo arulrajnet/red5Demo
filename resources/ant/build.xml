@@ -247,6 +247,7 @@
 			<fileset dir="${java.build.dir}" />
 		</copy>
 		<copy file="${java.src.dir}/logback-${application.name}.xml" todir="${dist.dir}/WEB-INF/classes" />
+		<copy file="${flex.export.swf}" todir="${dist.dir}/swf" />
 	</target>
 
 	<target name="war" depends="dist">

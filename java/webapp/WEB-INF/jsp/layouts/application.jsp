@@ -11,7 +11,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="<%= request.getContextPath() %>/css/main.css" rel="stylesheet" type="text/css" media="screen" />
     
-    <script type="text/javascript" src="<%= request.getContextPath() %>/scripts/swfobject.js"></script>
+    <tiles:insertAttribute name="pageHeader"/>
 	</head>
 	<body>
 		<div class="header">
