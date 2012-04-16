@@ -24,7 +24,12 @@
   <definition name="flash.viewer" extends="application">
   	<put-attribute name="pageHeader" value="/WEB-INF/jsp/tiles/flash/pageHeader.jsp"></put-attribute>
   	<put-attribute name="body" value="/WEB-INF/jsp/tiles/flash/viewer.jsp"></put-attribute>
-  </definition>    
+  </definition>
+  
+  <definition name="flash.broadcaster_info" extends="application">
+    <put-attribute name="pageHeader" value="/WEB-INF/jsp/tiles/flash/pageHeader.jsp"></put-attribute>
+    <put-attribute name="body" value="/WEB-INF/jsp/tiles/flash/info.jsp"></put-attribute>
+  </definition>
   
   <!-- Error messages -->
   <definition name="errors.notfound" template="/WEB-INF/jsp/layouts/application_error.jsp">

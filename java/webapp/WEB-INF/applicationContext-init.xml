@@ -9,11 +9,12 @@
 	
 	<bean id="placeholderConfig" class="com.demo.utils.PropertiesUtil">
     <property name="searchSystemEnvironment" value="true"></property>
-    <property name="ignoreResourceNotFound" value="true"></property>	
+    <property name="ignoreResourceNotFound" value="true"></property>
+    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_FALLBACK" />	
 		<property name="locations">
 			<list>
 				<value>/WEB-INF/red5Demo.properties</value>
-				<value>file:${red5.home}/config/red5Demo.properties</value>			
+				<value>file:${RED5_HOME}/config/red5Demo.properties</value>			
 			</list>
 		</property>
 	</bean>

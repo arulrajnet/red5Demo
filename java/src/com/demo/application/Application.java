@@ -428,8 +428,22 @@ public class Application extends MultiThreadedApplicationAdapter implements
 	public LinkedHashMap<String, Connection> getConnectionsMap() {
 		return connectionsMap;
 	}
+	
+  /**
+   * @return the channelsMap
+   */
+  public LinkedHashMap<String, Channel> getChannelsMap() {
+    return channelsMap;
+  }
+  
+  /**
+   * @return the globalScope
+   */
+  public IScope getGlobalScope() {
+    return globalScope;
+  }
 
-	/**
+  /**
 	 * @return the scopeMap
 	 */
 	public LinkedHashMap<String, IScope> getScopeMap() {

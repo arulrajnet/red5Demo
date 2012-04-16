@@ -11,7 +11,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="<%= request.getContextPath() %>/css/main.css" rel="stylesheet" type="text/css" media="screen" />
     
-    <tiles:insertAttribute name="pageHeader"/>
+    <tiles:insertAttribute name="pageHeader" ignore="true"/>
 	</head>
 	<body>
 		<div class="header">

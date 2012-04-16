@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.red5.io.utils.ObjectMap;
@@ -34,6 +36,7 @@ import com.demo.model.Channel;
 import com.demo.model.User;
 import com.demo.so.ChatSOSecurity;
 import com.demo.utils.DemoConstants;
+import com.demo.model.Connection;
 
 /**
  * @author arul
@@ -166,14 +169,58 @@ public class Red5Demo extends Application {
 	  return super.connect(connection, scope, params);
 	}
 	
-	 @Override
-	  public void streamBroadcastClose(IBroadcastStream stream) {
+  @Override
+  public void disconnect(IConnection connection, IScope scope) {
+    LOG.debug("Application dis-connect called from connection ID [" + connection.getClient().getId() + "]");
+    try {
+      String connId = connection.getClient().getId();
+      User demoUser = getUserByPublicId(connId);
+      Connection connections = getConnectionByPublicId(connId);
+
+      if (connections == null) {
+        connections = getConnectionByVideoId(connId);
+        demoUser = getUserByVideoId(connId);
+        if (connections != null) {
+          if (connections.getVideoId() != null) {
+            connections.setVideoId(null);
+            LOG.debug("Closing Video connection for user " + connections.getId() + ", Id [" + connId + "]");
+          }
+        } else {
+          connections = getConnectionByAudioId(connId);
+          demoUser = getUserByAudioId(connId);
+          if (connections != null) {
+            if (connections.getAudioId() != null) {
+              connections.setAudioId(null);
+              LOG.debug("Closing Audio connection for user " + connections.getId() + ", Id [" + connId + "]");
+            }
+          } else {
+            LOG.warn("Could not find user for the requested Id [" + connId + "]");
+          }
+        }
+      } else {
+        String id = demoUser.getId();
+        LOG.debug("The user " + id + " is removed from Map, Id [" + connId + "]");
+        connections.setPublicId(null);
+        usersMap.remove(id);
+        connectionsMap.remove(id);
+        channelsMap.remove(scope.getName());
+        scopeMap.remove(scope.getName());
+      }
+
+    } catch (Exception e) {
+      LOG.debug("Exception in appDisconnect....", e);
+    }
+    super.disconnect(connection, scope);
+  }
+	
+   @Override
+    public void streamBroadcastClose(IBroadcastStream stream) {
       ClientBroadcastStream broadcastStream = (ClientBroadcastStream) stream;
       if (broadcastStream.isRecording()) {
         broadcastStream.stopRecording();
       }       
-	    super.streamBroadcastClose(stream);
-	  }	 
+      super.streamBroadcastClose(stream);
+    }	 
 	
 	/* (non-Javadoc)
 	 * @see org.red5.server.adapter.MultiThreadedApplicationAdapter#streamSubscriberStart(org.red5.server.api.stream.ISubscriberStream)
@@ -196,6 +243,138 @@ public class Red5Demo extends Application {
 	/**
 	 * END: override function
 	 */
+	
+  /**
+   * @param id
+   * @return
+   */
+  private User getUserByPublicId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String chatId = connection.getPublicId();
+        if (connection != null && chatId != null && chatId.equals(id)) {
+          return usersMap.get(connection.getId());
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getUserByChatId() ", e);
+    } finally {
+    }
+    return null;
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  private User getUserByVideoId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String videoId = connection.getVideoId();
+        if (connection != null && videoId != null && videoId.equals(id)) {
+          return usersMap.get(connection.getId());
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getUserByVideoId() ", e);
+    } finally {
+    }
+    return null;
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  private User getUserByAudioId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String audioId = connection.getAudioId();
+        if (connection != null && audioId != null && audioId.equals(id)) {
+          return usersMap.get(connection.getId());
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getUserByAudioId() ", e);
+    } finally {
+    }
+    return null;
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  private Connection getConnectionByPublicId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String chatId = connection.getPublicId();
+        if (connection != null && chatId != null && chatId.equals(id)) {
+          return connection;
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getUserByChatId() ", e);
+    } finally {
+    }
+    return null;
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  private Connection getConnectionByVideoId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String videoId = connection.getVideoId();
+        if (connection != null && videoId != null && videoId.equals(id)) {
+          return connection;
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getUserByVideoId() ", e);
+    } finally {
+    }
+    return null;
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  private Connection getConnectionByAudioId(String id) {
+    try {
+      Collection<Connection> cl = connectionsMap.values();
+      Iterator<Connection> itr = cl.iterator();
+      while (itr.hasNext()) {
+        Connection connection = (Connection) itr.next();
+        String audioId = connection.getAudioId();
+        if (connection != null && audioId != null && audioId.equals(id)) {
+          return connection;
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Exception in getConnectionByChatId() ", e);
+    } finally {
+    }
+    return null;
+  }
 	
 	/**
 	 * START: RPC functions
