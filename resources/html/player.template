@@ -65,6 +65,7 @@
             var xiSwfUrlStr = "@expressInstallSwf@";
             var flashvars = {};
             flashvars.red5server = "@red5.server@";
+            flashvars.red5context = "@red5.context@";
             flashvars.secure = "@red5.secure@";
             flashvars.role = "player";
             flashvars.playerType = "@red5.playerType@";

@@ -66,6 +66,8 @@
 			[Bindable]
 			public var hostname:String;
 			[Bindable]
+			public var context:String;
+			[Bindable]
 			public var rtmpPort:Number;
 			[Bindable]
 			public var issecure:Boolean;
@@ -304,6 +306,7 @@
 				var url:String = this.url;
 				var flashvars:Object = this.parameters;
 				var red5server:String = flashvars["red5server"];
+				var red5context:String = flashvars["red5context"];
 				var secure:String = flashvars["secure"];
 				var red5port:String = flashvars["red5port"];
 				var role:String = flashvars["role"];
@@ -318,6 +321,13 @@
 				} else {
 					this.hostname = red5server;
 				}
+
+				if(red5context == null) {
+					this.context = DemoConstants.MAIN_APP;
+				} else {
+					this.context = red5context;
+				}
+
 				if(secure == null) {
 					this.issecure = URLUtil.isHttpsURL(url);
 				} else {
@@ -357,7 +367,7 @@
 					mainLayout.horizontalAlign = "left";
 				}				
 							
-				LOG.debug("Hostname : "+red5server+" Port : "+red5port+" Secure : "+issecure);
+				LOG.debug("Hostname : "+red5server+" Context : "+red5context+" Port : "+red5port+" Secure : "+issecure);
 				LOG.debug("role : "+role+ " playerType : "+ playerType +" channelName : "+channelName);
 			}
 			
@@ -406,7 +416,7 @@
 		</s:HGroup>
 		<s:HGroup>
 			<s:Label text="rtmp url : " />
-			<s:Label text="rtmp://{this.hostname}/{DemoConstants.MAIN_APP}/{demoChannel.channelName}/{DemoConstants.VIDEO_STREAM_NAME}" />
+			<s:Label text="rtmp://{this.hostname}/{this.context}/{demoChannel.channelName}/{DemoConstants.VIDEO_STREAM_NAME}" />
 		</s:HGroup>		
 	</s:VGroup>
 </s:Application>

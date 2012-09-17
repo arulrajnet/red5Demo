@@ -168,7 +168,6 @@ History	:
 				  useHandCursor="true" 
 				  buttonMode="true"    
 				  click="toggleFullscreen(event)" />
-		<mx:Image source="{LOGO}"/>
 	</s:SkinnableContainer>
 	
 </s:Group>

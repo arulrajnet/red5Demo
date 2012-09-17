@@ -31,6 +31,7 @@ package com.demo.connection
 	{
 		private static var LOG:ILogger = Log.getLogger('com.demo.connection.RTMPConnectionImpl');
 		private var hostname:String;
+		private var scope:String;
 		private var port:Number;
 		private var isHttps:Boolean;
 		private var clientObj:Object;
@@ -43,6 +44,7 @@ package com.demo.connection
 		
 		private function initConnectionVars():void {
 			hostname = FlexGlobals.topLevelApplication.hostname;
+			scope = FlexGlobals.topLevelApplication.context;
 			port = FlexGlobals.topLevelApplication.rtmpPort;
 			isHttps = FlexGlobals.topLevelApplication.issecure;
 		}
@@ -54,7 +56,7 @@ package com.demo.connection
 		public function createConnection(client:Object):void
 		{
 			var connectionName:String = "publicConn";
-			var scope:String = DemoConstants.MAIN_APP;
+			var scope:String = this.scope;
 			this.clientObj = client;
 			LOG.info("you are connecting to "+this.hostname+"..."+" client object "+clientObj);
 			
@@ -74,9 +76,9 @@ package com.demo.connection
 			}
 			
 			if(FlexGlobals.topLevelApplication.demoUser.role == Role.ADMIN) {
-				scope = DemoConstants.MAIN_APP+"/"+FlexGlobals.topLevelApplication.demoChannel.channelName;
+				scope = this.scope+"/"+FlexGlobals.topLevelApplication.demoChannel.channelName;
 			} else {
-				scope = DemoConstants.MAIN_APP+"/"+FlexGlobals.topLevelApplication.demoChannel.channelName;
+				scope = this.scope+"/"+FlexGlobals.topLevelApplication.demoChannel.channelName;
 			}
 			
 			if (this.isHttps) {

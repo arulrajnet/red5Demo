@@ -127,6 +127,7 @@
 						<token key="swf" value="${flex.swf.name}"/>
 						<token key="expressInstallSwf" value="${express.install.swf}"/>
 						<token key="red5.server" value="${dev.server}"/>
+						<token key="red5.context" value="${application.name}"/>
 						<token key="red5.secure" value="${dev.secure}"/>
 						<token key="project.name" value="${project.name}"/>
 						<token key="project.version" value="${project.version}"/>
@@ -151,6 +152,7 @@
 						<token key="swf" value="${flex.swf.name}"/>
 						<token key="expressInstallSwf" value="${express.install.swf}"/>
 						<token key="red5.server" value="${dev.server}"/>
+						<token key="red5.context" value="${application.name}"/>
 						<token key="red5.secure" value="${dev.secure}"/>
 						<token key="red5.playerType" value="video"/>						
 						<token key="project.name" value="${project.name}"/>
@@ -188,6 +190,7 @@
 					<token key="swf" value="${flex.swf.name}"/>
 					<token key="expressInstallSwf" value="${express.install.swf}"/>
 					<token key="red5.server" value="${production.server}"/>
+					<token key="red5.context" value="${application.name}"/>
 					<token key="red5.secure" value="${production.secure}"/>
 					<token key="project.name" value="${project.name}"/>
 					<token key="project.version" value="${project.version}"/>
@@ -212,6 +215,7 @@
 					<token key="swf" value="${flex.swf.name}"/>
 					<token key="expressInstallSwf" value="${express.install.swf}"/>
 					<token key="red5.server" value="${production.server}"/>
+					<token key="red5.context" value="${application.name}"/>
 					<token key="red5.secure" value="${production.secure}"/>
 					<token key="red5.playerType" value="video"/>
 					<token key="project.name" value="${project.name}"/>
